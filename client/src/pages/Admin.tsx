@@ -112,26 +112,45 @@ export default function Admin() {
       if (!error) {
         setNewVideo({ title: "", url: "", duration: "" });
         carregarDadosDoBanco();
+      } else {
+        alert("Erro ao adicionar vídeo: " + error.message);
       }
     }
   };
 
   const updateVideo = async () => {
     if (editingVideo) {
-      const { error } = await supabase.from("conteudos").update({
-        titulo: editingVideo.title, url: editingVideo.url, descricao: editingVideo.duration
-      }).eq("id", parseInt(editingVideo.id));
+      const idNumero = parseInt(editingVideo.id, 10);
+      if (isNaN(idNumero)) return alert("ID inválido detectado.");
+
+      const { error } = await supabase
+        .from("conteudos")
+        .update({
+          titulo: editingVideo.title,
+          url: editingVideo.url,
+          descricao: editingVideo.duration
+        })
+        .eq("id", idNumero);
 
       if (!error) {
         setEditingVideo(null);
         carregarDadosDoBanco();
+      } else {
+        alert("Erro ao atualizar vídeo: " + error.message);
       }
     }
   };
 
   const deleteVideo = async (id: string) => {
-    const { error } = await supabase.from("conteudos").delete().eq("id", parseInt(id));
-    if (!error) carregarDadosDoBanco();
+    if (!confirm("Tem certeza que deseja excluir este vídeo?")) return;
+    const idNumero = parseInt(id, 10);
+
+    const { error } = await supabase.from("conteudos").delete().eq("id", idNumero);
+    if (!error) {
+      carregarDadosDoBanco();
+    } else {
+      alert("Erro ao deletar: " + error.message);
+    }
   };
 
   // Documentos
@@ -143,26 +162,45 @@ export default function Admin() {
       if (!error) {
         setNewDoc({ title: "", type: "PDF", pages: "", url: "" });
         carregarDadosDoBanco();
+      } else {
+        alert("Erro ao adicionar documento: " + error.message);
       }
     }
   };
 
   const updateDocument = async () => {
     if (editingDoc) {
-      const { error } = await supabase.from("conteudos").update({
-        titulo: editingDoc.title, url: editingDoc.url, descricao: `${editingDoc.type} • ${editingDoc.pages}`
-      }).eq("id", parseInt(editingDoc.id));
+      const idNumero = parseInt(editingDoc.id, 10);
+      if (isNaN(idNumero)) return alert("ID inválido detectado.");
+
+      const { error } = await supabase
+        .from("conteudos")
+        .update({
+          titulo: editingDoc.title,
+          url: editingDoc.url,
+          descricao: editingDoc.pages // Salvando diretamente a alteração do texto descritivo
+        })
+        .eq("id", idNumero);
 
       if (!error) {
         setEditingDoc(null);
         carregarDadosDoBanco();
+      } else {
+        alert("Erro ao atualizar documento: " + error.message);
       }
     }
   };
 
   const deleteDocument = async (id: string) => {
-    const { error } = await supabase.from("conteudos").delete().eq("id", parseInt(id));
-    if (!error) carregarDadosDoBanco();
+    if (!confirm("Tem certeza que deseja remover este documento?")) return;
+    const idNumero = parseInt(id, 10);
+
+    const { error } = await supabase.from("conteudos").delete().eq("id", idNumero);
+    if (!error) {
+      carregarDadosDoBanco();
+    } else {
+      alert("Erro ao remover: " + error.message);
+    }
   };
 
   // Notícias / Práticas
@@ -174,26 +212,45 @@ export default function Admin() {
       if (!error) {
         setNewNews({ title: "", date: "", excerpt: "", content: "" });
         carregarDadosDoBanco();
+      } else {
+        alert("Erro ao adicionar notícia: " + error.message);
       }
     }
   };
 
   const updateNews = async () => {
     if (editingNews) {
-      const { error } = await supabase.from("conteudos").update({
-        titulo: editingNews.title, descricao: editingNews.excerpt, url: editingNews.content
-      }).eq("id", parseInt(editingNews.id));
+      const idNumero = parseInt(editingNews.id, 10);
+      if (isNaN(idNumero)) return alert("ID inválido detectado.");
+
+      const { error } = await supabase
+        .from("conteudos")
+        .update({
+          titulo: editingNews.title,
+          descricao: editingNews.excerpt,
+          url: editingNews.content
+        })
+        .eq("id", idNumero);
 
       if (!error) {
         setEditingNews(null);
         carregarDadosDoBanco();
+      } else {
+        alert("Erro ao atualizar notícia: " + error.message);
       }
     }
   };
 
   const deleteNews = async (id: string) => {
-    const { error } = await supabase.from("conteudos").delete().eq("id", parseInt(id));
-    if (!error) carregarDadosDoBanco();
+    if (!confirm("Tem certeza que deseja deletar esta notícia?")) return;
+    const idNumero = parseInt(id, 10);
+
+    const { error } = await supabase.from("conteudos").delete().eq("id", idNumero);
+    if (!error) {
+      carregarDadosDoBanco();
+    } else {
+      alert("Erro ao deletar: " + error.message);
+    }
   };
 
   if (!isAuthenticated) {
@@ -289,7 +346,7 @@ export default function Admin() {
                         <p className="text-xs text-gray-500 truncate max-w-sm">{video.url}</p>
                       </div>
                       <div className="flex gap-2">
-                        <Dialog>
+                        <Dialog onOpenChange={(open) => { if (!open) setEditingVideo(null); }}>
                           <DialogTrigger asChild>
                             <Button variant="outline" size="sm" onClick={() => setEditingVideo(video)} className="gap-2">
                               <Edit2 className="w-4 h-4" /> Editar
@@ -346,7 +403,7 @@ export default function Admin() {
                         <p className="text-sm text-muted-foreground">{doc.pages}</p>
                       </div>
                       <div className="flex gap-2">
-                        <Dialog>
+                        <Dialog onOpenChange={(open) => { if (!open) setEditingDoc(null); }}>
                           <DialogTrigger asChild>
                             <Button variant="outline" size="sm" onClick={() => setEditingDoc(doc)} className="gap-2">
                               <Edit2 className="w-4 h-4" /> Editar
@@ -356,8 +413,9 @@ export default function Admin() {
                             <DialogHeader><DialogTitle>Editar Documento</DialogTitle></DialogHeader>
                             {editingDoc && (
                               <div className="space-y-4 pt-4">
-                                <Input value={editingDoc.title} onChange={(e) => setEditingDoc({ ...editingDoc, title: e.target.value })} />
-                                <Input value={editingDoc.url} onChange={(e) => setEditingDoc({ ...editingDoc, url: e.target.value })} />
+                                <Input value={editingDoc.title} onChange={(e) => setEditingDoc({ ...editingDoc, title: e.target.value })} placeholder="Título" />
+                                <Input value={editingDoc.url} onChange={(e) => setEditingDoc({ ...editingDoc, url: e.target.value })} placeholder="URL" />
+                                <Input value={editingDoc.pages} onChange={(e) => setEditingDoc({ ...editingDoc, pages: e.target.value })} placeholder="Descrição / Páginas" />
                                 <Button onClick={updateDocument} className="w-full bg-accent text-white">Salvar</Button>
                               </div>
                             )}
@@ -399,7 +457,7 @@ export default function Admin() {
                         <p className="text-sm text-gray-600 mt-1">{n.excerpt}</p>
                       </div>
                       <div className="flex gap-2 ml-4">
-                        <Dialog>
+                        <Dialog onOpenChange={(open) => { if (!open) setEditingNews(null); }}>
                           <DialogTrigger asChild>
                             <Button variant="outline" size="sm" onClick={() => setEditingNews(n)} className="gap-2">
                               <Edit2 className="w-4 h-4" /> Editar
