@@ -179,15 +179,22 @@ export default function Home() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {videos.map((video) => (
-                <Card key={video.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <div className="relative h-48 bg-muted flex items-center justify-center">
+                <Card key={video.id} className="overflow-hidden hover:shadow-lg transition-shadow group">
+                  <div className="relative h-48 bg-muted flex items-center justify-center overflow-hidden">
+
+                    {/* 🎬 MINIATURA DINÂMICA DO YOUTUBE */}
                     <img
-                      src="https://d2xsxph8kpxj0f.cloudfront.net/310419663028293218/5GLksnZft2pDeCvxLa3U7u/videos-section-6Pf74GDtZRrKZcHiCzwv7z.webp"
+                      src={`https://img.youtube.com/vi/${(() => {
+                        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                        const match = video.url?.match(regExp);
+                        return (match && match[2].length === 11) ? match[2] : 'default';
+                      })()}/mqdefault.jpg`}
                       alt={video.titulo}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
-                    <a href={video.url} target="_blank" rel="noreferrer" className="absolute inset-0 bg-black/40 flex items-center justify-center hover:bg-black/50 transition-colors">
-                      <Play className="w-16 h-16 text-white" />
+
+                    <a href={video.url} target="_blank" rel="noreferrer" className="absolute inset-0 bg-black/30 flex items-center justify-center hover:bg-black/50 transition-colors">
+                      <Play className="w-16 h-16 text-white drop-shadow-md" />
                     </a>
                   </div>
                   <CardContent className="pt-4">
