@@ -52,10 +52,10 @@ export default function Admin() {
   const [editingDoc, setEditingDoc] = useState<Document | null>(null);
   const [editingNews, setEditingNews] = useState<News | null>(null);
 
-  // Estados Isolados para os Inputs dos Modais (Evita travamento de render)
+  // Estados Isolados para os Inputs dos Modais
   const [editTitle, setEditTitle] = useState("");
   const [editUrl, setEditUrl] = useState("");
-  const [editExtra, setEditExtra] = useState(""); // Serve para duration, pages ou content
+  const [editExtra, setEditExtra] = useState("");
 
   async function carregarDadosDoBanco() {
     try {
@@ -91,7 +91,6 @@ export default function Admin() {
     }
   }, [isAuthenticated]);
 
-  // Gatilhos para preencher os inputs primitivos ao selecionar o item para editar
   const iniciarEdicaoVideo = (video: Video) => {
     setEditingVideo(video);
     setEditTitle(video.title);
@@ -109,8 +108,8 @@ export default function Admin() {
   const iniciarEdicaoNews = (n: News) => {
     setEditingNews(n);
     setEditTitle(n.title);
-    setEditUrl(n.excerpt); // Guarda o resumo no campo URL
-    setEditExtra(n.content); // Guarda o conteúdo no campo extra
+    setEditUrl(n.excerpt);
+    setEditExtra(n.content);
   };
 
   const handleLogin = (e: React.FormEvent) => {
@@ -132,6 +131,8 @@ export default function Admin() {
       if (!error) {
         setNewVideo({ title: "", url: "", duration: "" });
         carregarDadosDoBanco();
+      } else {
+        alert("Erro ao adicionar vídeo: " + error.message);
       }
     }
   };
@@ -144,6 +145,8 @@ export default function Admin() {
       if (!error) {
         setNewDoc({ title: "", type: "PDF", pages: "", url: "" });
         carregarDadosDoBanco();
+      } else {
+        alert("Erro ao adicionar documento: " + error.message);
       }
     }
   };
@@ -156,76 +159,138 @@ export default function Admin() {
       if (!error) {
         setNewNews({ title: "", date: "", excerpt: "", content: "" });
         carregarDadosDoBanco();
+      } else {
+        alert("Erro ao adicionar notícia: " + error.message);
       }
     }
   };
 
   // ACTIONS: ATUALIZAR
-  const updateVideo = async () => {
-    if (editingVideo) {
+  const updateVideo = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!editingVideo) return;
+
+    try {
       const { error } = await supabase
         .from("conteudos")
         .update({ titulo: editTitle, url: editUrl, descricao: editExtra })
         .eq("id", parseInt(editingVideo.id, 10));
 
-      if (!error) {
-        setEditingVideo(null);
-        carregarDadosDoBanco();
+      if (error) {
+        alert("Erro retornado pelo Supabase: " + error.message);
       } else {
-        alert("Erro ao salvar: " + error.message);
+        alert("Vídeo atualizado com sucesso!");
+        setEditingVideo(null);
+        await carregarDadosDoBanco();
       }
+    } catch (err: any) {
+      alert("Falha operacional na edição: " + err.message);
     }
   };
 
-  const updateDocument = async () => {
-    if (editingDoc) {
+  const updateDocument = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!editingDoc) return;
+
+    try {
       const { error } = await supabase
         .from("conteudos")
         .update({ titulo: editTitle, url: editUrl, descricao: editExtra })
         .eq("id", parseInt(editingDoc.id, 10));
 
-      if (!error) {
-        setEditingDoc(null);
-        carregarDadosDoBanco();
+      if (error) {
+        alert("Erro retornado pelo Supabase: " + error.message);
       } else {
-        alert("Erro ao salvar: " + error.message);
+        alert("Documento atualizado com sucesso!");
+        setEditingDoc(null);
+        await carregarDadosDoBanco();
       }
+    } catch (err: any) {
+      alert("Falha operacional: " + err.message);
     }
   };
 
-  const updateNews = async () => {
-    if (editingNews) {
+  const updateNews = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!editingNews) return;
+
+    try {
       const { error } = await supabase
         .from("conteudos")
-        .update({ titulo: editTitle, descricao: editTitle, url: editExtra })
+        .update({ titulo: editTitle, descricao: editUrl, url: editExtra })
         .eq("id", parseInt(editingNews.id, 10));
 
-      if (!error) {
-        setEditingNews(null);
-        carregarDadosDoBanco();
+      if (error) {
+        alert("Erro retornado pelo Supabase: " + error.message);
       } else {
-        alert("Erro ao salvar: " + error.message);
+        alert("Notícia atualizada com sucesso!");
+        setEditingNews(null);
+        await carregarDadosDoBanco();
       }
+    } catch (err: any) {
+      alert("Falha operacional: " + err.message);
     }
   };
 
   // ACTIONS: DELETAR
   const deleteVideo = async (id: string) => {
-    if (!confirm("Tem certeza que deseja excluir este vídeo?")) return;
-    const { error } = await supabase.from("conteudos").delete().eq("id", parseInt(id, 10));
-    if (!error) carregarDadosDoBanco();
+    if (!confirm("Confirmar a exclusão permanente deste vídeo?")) return;
+
+    try {
+      const { error } = await supabase
+        .from("conteudos")
+        .delete()
+        .eq("id", parseInt(id, 10));
+
+      if (error) {
+        alert("O Supabase recusou a exclusão: " + error.message);
+      } else {
+        alert("Vídeo removido com sucesso!");
+        await carregarDadosDoBanco();
+      }
+    } catch (err: any) {
+      alert("Erro na deleção: " + err.message);
+    }
   };
 
   const deleteDocument = async (id: string) => {
-    if (!confirm("Tem certeza que deseja remover este documento?")) return;
-    const { error } = await supabase.from("conteudos").delete().eq("id", parseInt(id, 10));
-    if (!error) carregarDadosDoBanco();
+    if (!confirm("Confirmar a exclusão permanente deste documento?")) return;
+
+    try {
+      const { error } = await supabase
+        .from("conteudos")
+        .delete()
+        .eq("id", parseInt(id, 10));
+
+      if (error) {
+        alert("O Supabase recusou a exclusão: " + error.message);
+      } else {
+        alert("Documento removido com sucesso!");
+        await carregarDadosDoBanco();
+      }
+    } catch (err: any) {
+      alert("Erro na deleção: " + err.message);
+    }
   };
 
   const deleteNews = async (id: string) => {
-    if (!confirm("Tem certeza que deseja deletar esta notícia?")) return;
-    const { error } = await supabase.from("conteudos").delete().eq("id", parseInt(id, 10));
-    if (!error) carregarDadosDoBanco();
+    if (!confirm("Confirmar a exclusão permanente desta notícia?")) return;
+
+    try {
+      const { error } = await supabase
+        .from("conteudos")
+        .delete()
+        .eq("id", parseInt(id, 10));
+
+      if (error) {
+        alert("O Supabase recusou a exclusão: " + error.message);
+      } else {
+        alert("Notícia removida com sucesso!");
+        await carregarDadosDoBanco();
+      }
+    } catch (err: any) {
+      alert("Erro na deleção: " + err.message);
+    }
   };
 
   if (!isAuthenticated) {
@@ -350,7 +415,7 @@ export default function Admin() {
           {/* News Tab */}
           <TabsContent value="news" className="space-y-6">
             <Card>
-              <CardHeader><CardTitle>Adicionar Nova Prática Agroecológica</CardTitle></CardHeader>
+              <CardHeader><CardTitle>Adicionar Novo Prática Agroecológica</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 <Input placeholder="Título da notícia" value={newNews.title} onChange={(e) => setNewNews({ ...newNews, title: e.target.value })} />
                 <Textarea placeholder="Resumo explicativo" value={newNews.excerpt} onChange={(e) => setNewNews({ ...newNews, excerpt: e.target.value })} />
