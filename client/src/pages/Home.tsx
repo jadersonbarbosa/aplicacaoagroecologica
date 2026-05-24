@@ -115,25 +115,22 @@ export default function Home() {
             alt="Fazenda Sustentável"
             className="w-full h-full object-cover"
           />
-          {/* Suavizado o blackout para o logo aparecer bem nítido ao fundo */}
           <div className="absolute inset-0 bg-black/5"></div>
         </div>
 
-        {/* Bloco de Cima: Título e Subtítulo em Preto */}
-        <div className="relative z-10 text-center text-[#3d2817] max-w-4xl mx-auto px-4 mt-8">
-          <h1 className="text-5xl md:text-6xl font-bold mb-4" style={{ fontFamily: "Playfair Display" }}>
+        {/* Bloco de Cima: Apenas o Título Principal bem alto */}
+        <div className="relative z-10 text-center text-black max-w-4xl mx-auto px-4 mt-4">
+          <h1 className="text-5xl md:text-6xl font-bold drop-shadow-sm" style={{ fontFamily: "Playfair Display" }}>
             Agroecologia para um Futuro Sustentável
           </h1>
-          <p
-            className="text-lg md:text-xl font-bold max-w-2xl mx-auto text-[#3d2817] bg-white/50 backdrop-blur-xs px-4 py-2 rounded-xl shadow-sm inline-block"
-            style={{ fontFamily: "Lato" }}
-          >
-            Conhecimento prático e teórico para transformar a agricultura em harmonia com a natureza
-          </p>
         </div>
 
-        {/* Bloco de Baixo: Botão posicionado na parte inferior */}
-        <div className="relative z-10 flex justify-center px-4 mb-8">
+        {/* Bloco de Baixo: Subtítulo posicionado logo ACIMA do Botão */}
+        <div className="relative z-10 flex flex-col items-center text-center max-w-2xl mx-auto px-4 mb-8 gap-6">
+          <p className="text-lg md:text-xl font-bold text-black drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]" style={{ fontFamily: "Lato" }}>
+            Conhecimento prático e teórico para transformar a agricultura em harmonia com a natureza
+          </p>
+
           <a href="#videos">
             <Button size="lg" className="bg-[#6b8e6f] hover:bg-[#5a7a5e] text-white shadow-md font-medium px-8 py-6 text-base rounded-full transition-transform hover:scale-105">
               Explorar Conteúdo
