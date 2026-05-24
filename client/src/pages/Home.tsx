@@ -274,7 +274,11 @@ export default function Home() {
             <div>
               <h2 className="text-4xl md:text-5xl font-bold mb-6" style={{ fontFamily: "Playfair Display" }}>Nossa Missão</h2>
               <p className="text-lg mb-6" style={{ fontFamily: "Lato" }}>
-                Promover a agroecologia como caminho para a sustentabilidade, oferecendo conhecimento prático...
+                Esse repositório digital da EREFE Aplicação Vande de Souza Ferreira, tem como MISSÃO democratizar o acesso ao conhecimento, promovendo a socialização de experiências pedagógicas, pesquisas, projetos, produções acadêmicas e práticas voltadas à sustentabilidade, à agroecologia, à educação contextualizada e ao desenvolvimento territorial.
+
+                Buscamos construir um espaço colaborativo de aprendizagem, diálogo e partilha entre professores, estudantes, pesquisadores e comunidades, fortalecendo a integração entre escola, território e sociedade. O repositório pretende valorizar os saberes científicos e populares, incentivando práticas educativas comprometidas com a justiça socioambiental, a formação humana e o desenvolvimento sustentável do Semiárido.
+
+                Além de preservar e divulgar as produções desenvolvidas no contexto escolar e acadêmico, este espaço visa inspirar novas ações, projetos e pesquisas que contribuam para uma educação pública de qualidade, inclusiva, crítica e conectada às realidades locais.
               </p>
             </div>
             <div className="relative h-96 rounded-lg overflow-hidden shadow-lg">
@@ -301,16 +305,17 @@ export default function Home() {
                   <Mail className="w-6 h-6 text-accent flex-shrink-0 mt-1" />
                   <div>
                     <h3 className="font-semibold mb-1" style={{ fontFamily: "Lora" }}>Email</h3>
-                    <p className="text-muted-foreground">contato@agroecologia.com.br</p>
+                    <a
+                      href="https://formspree.io/f/xlgvwlwd"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muted-foreground hover:underline hover:text-[#3d2817] transition-colors"
+                    >
+                      contato@agroecologia.com.br
+                    </a>
                   </div>
                 </div>
-                <div className="flex gap-4">
-                  <Phone className="w-6 h-6 text-accent flex-shrink-0 mt-1" />
-                  <div>
-                    <h3 className="font-semibold mb-1" style={{ fontFamily: "Lora" }}>Telefone</h3>
-                    <p className="text-muted-foreground">(11) 3000-0000</p>
-                  </div>
-                </div>
+
               </div>
             </div>
 
