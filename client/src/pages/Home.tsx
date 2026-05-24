@@ -124,7 +124,10 @@ export default function Home() {
           <h1 className="text-5xl md:text-6xl font-bold mb-4" style={{ fontFamily: "Playfair Display" }}>
             Agroecologia para um Futuro Sustentável
           </h1>
-          <p className="text-lg md:text-xl font-medium max-w-2xl mx-auto" style={{ fontFamily: "Lato" }}>
+          <p
+            className="text-lg md:text-xl font-bold max-w-2xl mx-auto text-[#3d2817] bg-white/50 backdrop-blur-xs px-4 py-2 rounded-xl shadow-sm inline-block"
+            style={{ fontFamily: "Lato" }}
+          >
             Conhecimento prático e teórico para transformar a agricultura em harmonia com a natureza
           </p>
         </div>
