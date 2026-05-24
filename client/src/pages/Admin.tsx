@@ -3,10 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus, Trash2, Edit2, LogOut, Lock } from "lucide-react";
 import { useState, useEffect } from "react";
-import { supabase } from "../supabaseClient"; // Nossa conexão direta
+import { supabase } from "../supabaseClient";
 
 interface Video {
   id: string;
@@ -37,13 +37,11 @@ export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
 
-  // Listas reais vindo do Banco de Dados
   const [videos, setVideos] = useState<Video[]>([]);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [news, setNews] = useState<News[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Estados dos formulários de adição (originais)
   const [newVideo, setNewVideo] = useState({ title: "", url: "", duration: "" });
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);
 
@@ -53,7 +51,6 @@ export default function Admin() {
   const [newNews, setNewNews] = useState({ title: "", date: "", excerpt: "", content: "" });
   const [editingNews, setEditingNews] = useState<News | null>(null);
 
-  // Buscar dados reais do Supabase ao autenticar ou abrir a tela
   async function carregarDadosDoBanco() {
     try {
       setLoading(true);
@@ -61,7 +58,6 @@ export default function Admin() {
       if (error) throw error;
 
       if (data) {
-        // Mapeando os campos genéricos do banco para as interfaces originais do arquivo
         const videosDoBanco = data.filter(c => c.tipo === 'video').map(c => ({
           id: c.id.toString(), title: c.titulo, url: c.url, duration: c.descricao || ""
         }));
@@ -99,11 +95,7 @@ export default function Admin() {
     }
   };
 
-  // ==========================================
-  // HANDLERS DO BANCO (Substituindo a memória)
-  // ==========================================
-
-  // Vídeos
+  // HANDLERS
   const addVideo = async () => {
     if (newVideo.title && newVideo.url) {
       const { error } = await supabase.from("conteudos").insert([
@@ -112,17 +104,12 @@ export default function Admin() {
       if (!error) {
         setNewVideo({ title: "", url: "", duration: "" });
         carregarDadosDoBanco();
-      } else {
-        alert("Erro ao adicionar vídeo: " + error.message);
       }
     }
   };
 
   const updateVideo = async () => {
     if (editingVideo) {
-      const idNumero = parseInt(editingVideo.id, 10);
-      if (isNaN(idNumero)) return alert("ID inválido detectado.");
-
       const { error } = await supabase
         .from("conteudos")
         .update({
@@ -130,22 +117,20 @@ export default function Admin() {
           url: editingVideo.url,
           descricao: editingVideo.duration
         })
-        .eq("id", idNumero);
+        .eq("id", parseInt(editingVideo.id, 10));
 
       if (!error) {
         setEditingVideo(null);
         carregarDadosDoBanco();
       } else {
-        alert("Erro ao atualizar vídeo: " + error.message);
+        alert("Erro ao atualizar: " + error.message);
       }
     }
   };
 
   const deleteVideo = async (id: string) => {
     if (!confirm("Tem certeza que deseja excluir este vídeo?")) return;
-    const idNumero = parseInt(id, 10);
-
-    const { error } = await supabase.from("conteudos").delete().eq("id", idNumero);
+    const { error } = await supabase.from("conteudos").delete().eq("id", parseInt(id, 10));
     if (!error) {
       carregarDadosDoBanco();
     } else {
@@ -153,7 +138,6 @@ export default function Admin() {
     }
   };
 
-  // Documentos
   const addDocument = async () => {
     if (newDoc.title && newDoc.url) {
       const { error } = await supabase.from("conteudos").insert([
@@ -162,48 +146,34 @@ export default function Admin() {
       if (!error) {
         setNewDoc({ title: "", type: "PDF", pages: "", url: "" });
         carregarDadosDoBanco();
-      } else {
-        alert("Erro ao adicionar documento: " + error.message);
       }
     }
   };
 
   const updateDocument = async () => {
     if (editingDoc) {
-      const idNumero = parseInt(editingDoc.id, 10);
-      if (isNaN(idNumero)) return alert("ID inválido detectado.");
-
       const { error } = await supabase
         .from("conteudos")
         .update({
           titulo: editingDoc.title,
           url: editingDoc.url,
-          descricao: editingDoc.pages // Salvando diretamente a alteração do texto descritivo
+          descricao: editingDoc.pages
         })
-        .eq("id", idNumero);
+        .eq("id", parseInt(editingDoc.id, 10));
 
       if (!error) {
         setEditingDoc(null);
         carregarDadosDoBanco();
-      } else {
-        alert("Erro ao atualizar documento: " + error.message);
       }
     }
   };
 
   const deleteDocument = async (id: string) => {
     if (!confirm("Tem certeza que deseja remover este documento?")) return;
-    const idNumero = parseInt(id, 10);
-
-    const { error } = await supabase.from("conteudos").delete().eq("id", idNumero);
-    if (!error) {
-      carregarDadosDoBanco();
-    } else {
-      alert("Erro ao remover: " + error.message);
-    }
+    const { error } = await supabase.from("conteudos").delete().eq("id", parseInt(id, 10));
+    if (!error) carregarDadosDoBanco();
   };
 
-  // Notícias / Práticas
   const addNews = async () => {
     if (newNews.title) {
       const { error } = await supabase.from("conteudos").insert([
@@ -212,17 +182,12 @@ export default function Admin() {
       if (!error) {
         setNewNews({ title: "", date: "", excerpt: "", content: "" });
         carregarDadosDoBanco();
-      } else {
-        alert("Erro ao adicionar notícia: " + error.message);
       }
     }
   };
 
   const updateNews = async () => {
     if (editingNews) {
-      const idNumero = parseInt(editingNews.id, 10);
-      if (isNaN(idNumero)) return alert("ID inválido detectado.");
-
       const { error } = await supabase
         .from("conteudos")
         .update({
@@ -230,27 +195,19 @@ export default function Admin() {
           descricao: editingNews.excerpt,
           url: editingNews.content
         })
-        .eq("id", idNumero);
+        .eq("id", parseInt(editingNews.id, 10));
 
       if (!error) {
         setEditingNews(null);
         carregarDadosDoBanco();
-      } else {
-        alert("Erro ao atualizar notícia: " + error.message);
       }
     }
   };
 
   const deleteNews = async (id: string) => {
     if (!confirm("Tem certeza que deseja deletar esta notícia?")) return;
-    const idNumero = parseInt(id, 10);
-
-    const { error } = await supabase.from("conteudos").delete().eq("id", idNumero);
-    if (!error) {
-      carregarDadosDoBanco();
-    } else {
-      alert("Erro ao deletar: " + error.message);
-    }
+    const { error } = await supabase.from("conteudos").delete().eq("id", parseInt(id, 10));
+    if (!error) carregarDadosDoBanco();
   };
 
   if (!isAuthenticated) {
@@ -310,28 +267,12 @@ export default function Admin() {
           {/* Videos Tab */}
           <TabsContent value="videos" className="space-y-6">
             <Card>
-              <CardHeader>
-                <CardTitle>Adicionar Novo Vídeo no Supabase</CardTitle>
-              </CardHeader>
+              <CardHeader><CardTitle>Adicionar Novo Vídeo no Supabase</CardTitle></CardHeader>
               <CardContent className="space-y-4">
-                <Input
-                  placeholder="Título do vídeo"
-                  value={newVideo.title}
-                  onChange={(e) => setNewVideo({ ...newVideo, title: e.target.value })}
-                />
-                <Input
-                  placeholder="URL do YouTube"
-                  value={newVideo.url}
-                  onChange={(e) => setNewVideo({ ...newVideo, url: e.target.value })}
-                />
-                <Input
-                  placeholder="Duração (ex: 12:34)"
-                  value={newVideo.duration}
-                  onChange={(e) => setNewVideo({ ...newVideo, duration: e.target.value })}
-                />
-                <Button onClick={addVideo} className="w-full bg-accent hover:bg-accent/90 text-white gap-2">
-                  <Plus className="w-4 h-4" /> Adicionar Vídeo Real
-                </Button>
+                <Input placeholder="Título do vídeo" value={newVideo.title} onChange={(e) => setNewVideo({ ...newVideo, title: e.target.value })} />
+                <Input placeholder="URL do YouTube" value={newVideo.url} onChange={(e) => setNewVideo({ ...newVideo, url: e.target.value })} />
+                <Input placeholder="Duração (ex: 12:34)" value={newVideo.duration} onChange={(e) => setNewVideo({ ...newVideo, duration: e.target.value })} />
+                <Button onClick={addVideo} className="w-full bg-accent hover:bg-accent/90 text-white gap-2"><Plus className="w-4 h-4" /> Adicionar Vídeo Real</Button>
               </CardContent>
             </Card>
 
@@ -346,24 +287,9 @@ export default function Admin() {
                         <p className="text-xs text-gray-500 truncate max-w-sm">{video.url}</p>
                       </div>
                       <div className="flex gap-2">
-                        <Dialog onOpenChange={(open) => { if (!open) setEditingVideo(null); }}>
-                          <DialogTrigger asChild>
-                            <Button variant="outline" size="sm" onClick={() => setEditingVideo(video)} className="gap-2">
-                              <Edit2 className="w-4 h-4" /> Editar
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader><DialogTitle>Editar Vídeo no Banco</DialogTitle></DialogHeader>
-                            {editingVideo && (
-                              <div className="space-y-4 pt-4">
-                                <Input value={editingVideo.title} onChange={(e) => setEditingVideo({ ...editingVideo, title: e.target.value })} placeholder="Título" />
-                                <Input value={editingVideo.url} onChange={(e) => setEditingVideo({ ...editingVideo, url: e.target.value })} placeholder="URL" />
-                                <Input value={editingVideo.duration} onChange={(e) => setEditingVideo({ ...editingVideo, duration: e.target.value })} placeholder="Duração" />
-                                <Button onClick={updateVideo} className="w-full bg-accent text-white">Salvar Mudanças</Button>
-                              </div>
-                            )}
-                          </DialogContent>
-                        </Dialog>
+                        <Button variant="outline" size="sm" onClick={() => setEditingVideo(video)} className="gap-2">
+                          <Edit2 className="w-4 h-4" /> Editar
+                        </Button>
                         <Button variant="destructive" size="sm" onClick={() => deleteVideo(video.id)} className="gap-2">
                           <Trash2 className="w-4 h-4" /> Excluir
                         </Button>
@@ -386,9 +312,7 @@ export default function Admin() {
                 </select>
                 <Input placeholder="Número de páginas" value={newDoc.pages} onChange={(e) => setNewDoc({ ...newDoc, pages: e.target.value })} />
                 <Input placeholder="URL do documento" value={newDoc.url} onChange={(e) => setNewDoc({ ...newDoc, url: e.target.value })} />
-                <Button onClick={addDocument} className="w-full bg-accent hover:bg-accent/90 text-white gap-2">
-                  <Plus className="w-4 h-4" /> Publicar Documento
-                </Button>
+                <Button onClick={addDocument} className="w-full bg-accent hover:bg-accent/90 text-white gap-2"><Plus className="w-4 h-4" /> Publicar Documento</Button>
               </CardContent>
             </Card>
 
@@ -403,24 +327,9 @@ export default function Admin() {
                         <p className="text-sm text-muted-foreground">{doc.pages}</p>
                       </div>
                       <div className="flex gap-2">
-                        <Dialog onOpenChange={(open) => { if (!open) setEditingDoc(null); }}>
-                          <DialogTrigger asChild>
-                            <Button variant="outline" size="sm" onClick={() => setEditingDoc(doc)} className="gap-2">
-                              <Edit2 className="w-4 h-4" /> Editar
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader><DialogTitle>Editar Documento</DialogTitle></DialogHeader>
-                            {editingDoc && (
-                              <div className="space-y-4 pt-4">
-                                <Input value={editingDoc.title} onChange={(e) => setEditingDoc({ ...editingDoc, title: e.target.value })} placeholder="Título" />
-                                <Input value={editingDoc.url} onChange={(e) => setEditingDoc({ ...editingDoc, url: e.target.value })} placeholder="URL" />
-                                <Input value={editingDoc.pages} onChange={(e) => setEditingDoc({ ...editingDoc, pages: e.target.value })} placeholder="Descrição / Páginas" />
-                                <Button onClick={updateDocument} className="w-full bg-accent text-white">Salvar</Button>
-                              </div>
-                            )}
-                          </DialogContent>
-                        </Dialog>
+                        <Button variant="outline" size="sm" onClick={() => setEditingDoc(doc)} className="gap-2">
+                          <Edit2 className="w-4 h-4" /> Editar
+                        </Button>
                         <Button variant="destructive" size="sm" onClick={() => deleteDocument(doc.id)} className="gap-2">
                           <Trash2 className="w-4 h-4" /> Remover
                         </Button>
@@ -440,9 +349,7 @@ export default function Admin() {
                 <Input placeholder="Título da notícia" value={newNews.title} onChange={(e) => setNewNews({ ...newNews, title: e.target.value })} />
                 <Textarea placeholder="Resumo explicativo" value={newNews.excerpt} onChange={(e) => setNewNews({ ...newNews, excerpt: e.target.value })} />
                 <Textarea placeholder="Link complementar ou Conteúdo" value={newNews.content} onChange={(e) => setNewNews({ ...newNews, content: e.target.value })} />
-                <Button onClick={addNews} className="w-full bg-accent hover:bg-accent/90 text-white gap-2">
-                  <Plus className="w-4 h-4" /> Publicar Notícia Real
-                </Button>
+                <Button onClick={addNews} className="w-full bg-accent hover:bg-accent/90 text-white gap-2"><Plus className="w-4 h-4" /> Publicar Notícia Real</Button>
               </CardContent>
             </Card>
 
@@ -457,24 +364,9 @@ export default function Admin() {
                         <p className="text-sm text-gray-600 mt-1">{n.excerpt}</p>
                       </div>
                       <div className="flex gap-2 ml-4">
-                        <Dialog onOpenChange={(open) => { if (!open) setEditingNews(null); }}>
-                          <DialogTrigger asChild>
-                            <Button variant="outline" size="sm" onClick={() => setEditingNews(n)} className="gap-2">
-                              <Edit2 className="w-4 h-4" /> Editar
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-2xl">
-                            <DialogHeader><DialogTitle>Editar Conteúdo Noticioso</DialogTitle></DialogHeader>
-                            {editingNews && (
-                              <div className="space-y-4 pt-4">
-                                <Input value={editingNews.title} onChange={(e) => setEditingNews({ ...editingNews, title: e.target.value })} />
-                                <Textarea value={editingNews.excerpt} onChange={(e) => setEditingNews({ ...editingNews, excerpt: e.target.value })} />
-                                <Textarea value={editingNews.content} onChange={(e) => setEditingNews({ ...editingNews, content: e.target.value })} />
-                                <Button onClick={updateNews} className="w-full bg-accent text-white">Atualizar</Button>
-                              </div>
-                            )}
-                          </DialogContent>
-                        </Dialog>
+                        <Button variant="outline" size="sm" onClick={() => setEditingNews(n)} className="gap-2">
+                          <Edit2 className="w-4 h-4" /> Editar
+                        </Button>
                         <Button variant="destructive" size="sm" onClick={() => deleteNews(n.id)} className="gap-2">
                           <Trash2 className="w-4 h-4" /> Deletar
                         </Button>
@@ -487,6 +379,51 @@ export default function Admin() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* MODAL GLOBAL DE EDIÇÃO DE VÍDEO (REMOVIDO DE DENTRO DO .MAP) */}
+      <Dialog open={editingVideo !== null} onOpenChange={(open) => { if (!open) setEditingVideo(null); }}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Editar Vídeo no Banco</DialogTitle></DialogHeader>
+          {editingVideo && (
+            <div className="space-y-4 pt-4">
+              <Input value={editingVideo.title} onChange={(e) => setEditingVideo({ ...editingVideo, title: e.target.value })} placeholder="Título" />
+              <Input value={editingVideo.url} onChange={(e) => setEditingVideo({ ...editingVideo, url: e.target.value })} placeholder="URL" />
+              <Input value={editingVideo.duration} onChange={(e) => setEditingVideo({ ...editingVideo, duration: e.target.value })} placeholder="Duração" />
+              <Button onClick={updateVideo} className="w-full bg-accent text-white">Salvar Mudanças</Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* MODAL GLOBAL DE EDIÇÃO DE DOCUMENTO */}
+      <Dialog open={editingDoc !== null} onOpenChange={(open) => { if (!open) setEditingDoc(null); }}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Editar Documento</DialogTitle></DialogHeader>
+          {editingDoc && (
+            <div className="space-y-4 pt-4">
+              <Input value={editingDoc.title} onChange={(e) => setEditingDoc({ ...editingDoc, title: e.target.value })} placeholder="Título" />
+              <Input value={editingDoc.url} onChange={(e) => setEditingDoc({ ...editingDoc, url: e.target.value })} placeholder="URL" />
+              <Input value={editingDoc.pages} onChange={(e) => setEditingDoc({ ...editingDoc, pages: e.target.value })} placeholder="Descrição / Páginas" />
+              <Button onClick={updateDocument} className="w-full bg-accent text-white">Salvar</Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* MODAL GLOBAL DE EDIÇÃO DE NOTÍCIA */}
+      <Dialog open={editingNews !== null} onOpenChange={(open) => { if (!open) setEditingNews(null); }}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader><DialogTitle>Editar Conteúdo Noticioso</DialogTitle></DialogHeader>
+          {editingNews && (
+            <div className="space-y-4 pt-4">
+              <Input value={editingNews.title} onChange={(e) => setEditingNews({ ...editingNews, title: e.target.value })} />
+              <Textarea value={editingNews.excerpt} onChange={(e) => setEditingNews({ ...editingNews, excerpt: e.target.value })} />
+              <Textarea value={editingNews.content} onChange={(e) => setEditingNews({ ...editingNews, content: e.target.value })} />
+              <Button onClick={updateNews} className="w-full bg-accent text-white">Atualizar</Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
