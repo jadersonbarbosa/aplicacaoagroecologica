@@ -310,7 +310,7 @@ export default function Home() {
                       onClick={(e) => {
                         e.preventDefault();
                         // O JavaScript junta as partes na hora do clique para abrir o app de e-mail
-                        const usuario = "seu_email_real";
+                        const usuario = "aplicacaocompartilhada";
                         const dominio = "gmail.com";
                         window.location.href = `mailto:${usuario}@${dominio}?subject=Contato%20Site`;
                       }}
