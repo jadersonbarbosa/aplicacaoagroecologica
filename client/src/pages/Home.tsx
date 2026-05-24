@@ -306,17 +306,10 @@ export default function Home() {
                   <div>
                     <h3 className="font-semibold mb-1" style={{ fontFamily: "Lora" }}>Email</h3>
                     <a
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        // O JavaScript junta as partes na hora do clique para abrir o app de e-mail
-                        const usuario = "aplicacaocompartilhada";
-                        const dominio = "gmail.com";
-                        window.location.href = `mailto:${usuario}@${dominio}?subject=Contato%20Site`;
-                      }}
+
                       className="text-muted-foreground hover:underline hover:text-[#3d2817] transition-colors"
                     >
-                      contato@agroecologia.com.br
+                      aplicacaocompartilhada@gmail.com
                     </a>
                   </div>
                 </div>
