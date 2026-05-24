@@ -108,30 +108,34 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative h-screen flex flex-col justify-between overflow-hidden pt-24 pb-16">
         <div className="absolute inset-0 z-0">
-          {/* 🔴 ALTERE O NOME DA IMAGEM ABAIXO PARA A SUA IMAGEM NOVA SE DESEJAR */}
           <img
             src="/logo-front.jpeg"
             alt="Fazenda Sustentável"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-black/30"></div>
+          {/* Suavizado o blackout para o logo aparecer bem nítido ao fundo */}
+          <div className="absolute inset-0 bg-black/5"></div>
         </div>
-        <div className="relative z-10 text-center text-white max-w-3xl mx-auto px-4">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 drop-shadow-lg" style={{ fontFamily: "Playfair Display" }}>
+
+        {/* Bloco de Cima: Título e Subtítulo em Preto */}
+        <div className="relative z-10 text-center text-[#3d2817] max-w-4xl mx-auto px-4 mt-8">
+          <h1 className="text-5xl md:text-6xl font-bold mb-4" style={{ fontFamily: "Playfair Display" }}>
             Agroecologia para um Futuro Sustentável
           </h1>
-          <p className="text-lg md:text-2xl mb-8 drop-shadow-md" style={{ fontFamily: "Lato" }}>
+          <p className="text-lg md:text-xl font-medium max-w-2xl mx-auto" style={{ fontFamily: "Lato" }}>
             Conhecimento prático e teórico para transformar a agricultura em harmonia com a natureza
           </p>
-          <div className="flex gap-4 justify-center flex-wrap">
-            <a href="#videos">
-              <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                Explorar Conteúdo
-              </Button>
-            </a>
-          </div>
+        </div>
+
+        {/* Bloco de Baixo: Botão posicionado na parte inferior */}
+        <div className="relative z-10 flex justify-center px-4 mb-8">
+          <a href="#videos">
+            <Button size="lg" className="bg-[#6b8e6f] hover:bg-[#5a7a5e] text-white shadow-md font-medium px-8 py-6 text-base rounded-full transition-transform hover:scale-105">
+              Explorar Conteúdo
+            </Button>
+          </a>
         </div>
       </section>
 
