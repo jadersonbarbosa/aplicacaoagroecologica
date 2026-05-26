@@ -26,6 +26,19 @@ export default function Home() {
   const [noticias, setNoticias] = useState<Conteudo[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // 🎨 Função para gerar uma combinação de cor exclusiva baseada no ID do documento
+  const obterCorCapa = (id: number) => {
+    const cores = [
+      "from-[#4a6b53] to-[#2c4032]", // Verde Agroecológico
+      "from-[#8c6239] to-[#593e24]", // Marrom Terra
+      "from-[#d9a05b] to-[#a67132]", // Ouro/Trigo
+      "from-[#5c7a8c] to-[#3a4f5b]", // Azul Argila
+      "from-[#705c8c] to-[#473a59]", // Roxo Orgânico
+    ];
+    const indice = Math.abs(id % cores.length);
+    return cores[indice];
+  };
+
   // Carregar os dados dinamicamente do banco de dados ao abrir a página
   useEffect(() => {
     async function carregarConteudos() {
@@ -219,21 +232,74 @@ export default function Home() {
           {documentos.length === 0 ? (
             <p className="text-muted-foreground">Nenhuma cartilha cadastrada.</p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {documentos.map((doc) => (
-                <Card key={doc.id} className="flex items-center gap-4 p-6 hover:shadow-lg transition-shadow">
-                  <div className="bg-secondary/20 p-4 rounded-lg">
-                    <FileText className="w-8 h-8 text-secondary" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold mb-1" style={{ fontFamily: "Lora" }}>{doc.titulo}</h3>
-                    <p className="text-sm text-muted-foreground">{doc.descricao}</p>
-                  </div>
-                  <Button variant="outline" size="sm" onClick={() => window.open(doc.url, '_blank')}>
-                    Ver
-                  </Button>
-                </Card>
-              ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {documentos.map((doc) => {
+                const gradienteCapa = obterCorCapa(doc.id);
+
+                return (
+                  <Card key={doc.id} className="overflow-hidden hover:shadow-lg transition-all group flex flex-col justify-between bg-white border border-border">
+
+                    {/* 📄 CAPA EDITÁVEL DINÂMICA VIA CSS/TAILWIND BASEADA NO TEMA */}
+                    <div className={`relative aspect-[4/3] w-full bg-gradient-to-br ${gradienteCapa} p-5 flex flex-col justify-between text-white overflow-hidden shadow-inner`}>
+
+                      {/* Textura de linhas sutis ao fundo para dar aspecto de papel/capa */}
+                      <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[size:100%_12px]"></div>
+
+                      {/* Identificador superior da capa */}
+                      <div className="flex justify-between items-center z-10">
+                        <span className="text-[10px] font-bold tracking-wider uppercase bg-white/20 px-2 py-0.5 rounded backdrop-blur-sm">
+                          Publicação Científica
+                        </span>
+                        <FileText className="w-5 h-5 opacity-70" />
+                      </div>
+
+                      {/* Título renderizado dinamicamente direto no design da capa */}
+                      <div className="my-auto z-10 text-center px-2">
+                        <h5 className="font-bold text-sm sm:text-base line-clamp-3 leading-tight drop-shadow-md" style={{ fontFamily: "Playfair Display" }}>
+                          {doc.titulo}
+                        </h5>
+                        <div className="w-8 h-[2px] bg-white/50 mx-auto mt-2 rounded"></div>
+                      </div>
+
+                      {/* Rodapé interno da miniatura gráfica */}
+                      <div className="flex justify-between items-center text-[11px] opacity-90 border-t border-white/20 pt-2 z-10">
+                        <span className="truncate max-w-[150px] italic">
+                          {doc.descricao || "Material Didático"}
+                        </span>
+                        <span className="font-bold uppercase text-[9px] bg-white text-gray-900 px-1.5 py-0.5 rounded shadow-sm">
+                          PDF
+                        </span>
+                      </div>
+
+                      {/* Efeito 3D simulando relevo/lombada de livro encadernado no canto esquerdo */}
+                      <div className="absolute left-0 top-0 bottom-0 w-2.5 bg-gradient-to-r from-black/25 to-transparent"></div>
+                      <div className="absolute left-2.5 top-0 bottom-0 w-[1px] bg-white/10"></div>
+                    </div>
+
+                    {/* Informações detalhadas do card abaixo da capa */}
+                    <CardContent className="p-5 flex-grow flex flex-col justify-between">
+                      <div className="mb-4">
+                        <h4 className="font-bold text-gray-900 text-lg line-clamp-1 mb-1" style={{ fontFamily: "Lora" }}>
+                          {doc.titulo}
+                        </h4>
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {doc.descricao || "Clique no botão ao lado para abrir e visualizar este documento completo."}
+                        </p>
+                      </div>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full border-accent text-accent hover:bg-accent hover:text-white transition-colors gap-2"
+                        onClick={() => window.open(doc.url, '_blank')}
+                      >
+                        Acessar Documento Real →
+                      </Button>
+                    </CardContent>
+
+                  </Card>
+                );
+              })}
             </div>
           )}
         </div>
@@ -275,9 +341,9 @@ export default function Home() {
               <h2 className="text-4xl md:text-5xl font-bold mb-6" style={{ fontFamily: "Playfair Display" }}>Nossa Missão</h2>
               <p className="text-lg mb-6" style={{ fontFamily: "Lato" }}>
                 Esse repositório digital da EREFE Aplicação Vande de Souza Ferreira, tem como MISSÃO democratizar o acesso ao conhecimento, promovendo a socialização de experiências pedagógicas, pesquisas, projetos, produções acadêmicas e práticas voltadas à sustentabilidade, à agroecologia, à educação contextualizada e ao desenvolvimento territorial.
-
-                Buscamos construir um espaço colaborativo de aprendizagem, diálogo e partilha entre professores, estudantes, pesquisadores e comunidades, fortalecendo a integração entre escola, território e sociedade. O repositório pretende valorizar os saberes científicos e populares, incentivando práticas educativas comprometidas com a justiça socioambiental, a formação humana e o desenvolvimento sustentável do Semiárido.
-
+                <br /><br />
+                Buscando construir um espaço colaborativo de aprendizagem, diálogo e partilha entre professores, estudantes, pesquisadores e comunidades, fortalecendo a integração entre escola, território e sociedade. O repositório pretende valorizar os saberes científicos e populares, incentivando práticas educativas comprometidas com a justiça socioambiental, a formação humana e o desenvolvimento sustentável do Semiárido.
+                <br /><br />
                 Além de preservar e divulgar as produções desenvolvidas no contexto escolar e acadêmico, este espaço visa inspirar novas ações, projetos e pesquisas que contribuam para uma educação pública de qualidade, inclusiva, crítica e conectada às realidades locais.
               </p>
             </div>
@@ -306,14 +372,19 @@ export default function Home() {
                   <div>
                     <h3 className="font-semibold mb-1" style={{ fontFamily: "Lora" }}>Email</h3>
                     <a
-
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const user = "aplicacaocompartilhada";
+                        const domain = "gmail.com";
+                        window.location.href = `mailto:${user}@${domain}?subject=Contato%20Repositório%20Agroecologia`;
+                      }}
                       className="text-muted-foreground hover:underline hover:text-[#3d2817] transition-colors"
                     >
                       aplicacaocompartilhada@gmail.com
                     </a>
                   </div>
                 </div>
-
               </div>
             </div>
 
